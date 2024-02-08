@@ -3,3 +3,9 @@ beautifulsoup4==4.12.3
 python-dotenv==1.0.1
 requests==2.31.0
 webdriver-manager==4.0.1
+aiogram==3.3.0
+isort==5.13.2
+flake8==7.0.0
+flake8-quotes==3.3.2
+flake8-variables-names==0.0.6
+pep8-naming==0.13.3
