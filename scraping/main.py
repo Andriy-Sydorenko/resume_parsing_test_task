@@ -1,10 +1,8 @@
-from scraping.scrapers import WorkUaScraper
-
 RESUME_DISPLAY_COUNT = 5
 
 
-async def parse_resumes(filters: dict):
-    parser = WorkUaScraper()
+async def parse_resumes(parser_class, filters: dict):
+    parser = parser_class()
     # TODO: make method universal, not only for work ua
     await parser.find_resumes_without_filters(filters=filters)
     await parser.apply_filters(filters=filters)

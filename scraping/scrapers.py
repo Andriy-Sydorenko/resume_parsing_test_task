@@ -79,37 +79,39 @@ class WorkUaScraper(BaseResumeScraper):
     """
     Resume scrapper for work.ua
     """
+
+    work_experience = {
+        "Without experience": 0,
+        "Up to 1 year": 1,
+        "1-2 years": 164,
+        "2-5 years": 165,
+        "5+ years": 166,
+    }
+    employment_type = {
+        "Full time": 74,
+        "Part time": 75,
+    }
+    salaries = {
+        2000: 2,
+        3000: 3,
+        4000: 4,
+        5000: 5,
+        6000: 6,
+        7000: 7,
+        8000: 8,
+        9000: 9,
+        10000: 10,
+        15000: 11,
+        20000: 12,
+        25000: 13,
+        30000: 14,
+        40000: 15,
+        50000: 16,
+        100000: 17,
+    }
+
     def __init__(self):
         super().__init__(os.getenv("WORK_UA_BASE_URL"))
-        self.work_experience = {
-            "Without experience": 0,
-            "Up to 1 year": 1,
-            "1-2 years": 164,
-            "2-5 years": 165,
-            "5+ years": 166,
-        }
-        self.employment_type = {
-            "Full time": 74,
-            "Part time": 75,
-        }
-        self.salaries = {
-            2000: 2,
-            3000: 3,
-            4000: 4,
-            5000: 5,
-            6000: 6,
-            7000: 7,
-            8000: 8,
-            9000: 9,
-            10000: 10,
-            15000: 11,
-            20000: 12,
-            25000: 13,
-            30000: 14,
-            40000: 15,
-            50000: 16,
-            100000: 17,
-        }
 
     async def find_resumes_without_filters(self, filters: dict):
         """

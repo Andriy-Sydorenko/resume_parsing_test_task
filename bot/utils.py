@@ -1,37 +1,43 @@
 from aiogram import types
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from scraping.main import RESUME_DISPLAY_COUNT
 
-MAX_MESSAGE_LENGTH = 4096
+
+async def send_message_with_resumes(callback_query: types.CallbackQuery,
+                                    list_of_dicts,
+                                    total_resume_count,
+                                    warning=None):
+    resumes = ""
+    for resume_dict in list_of_dicts[:RESUME_DISPLAY_COUNT]:  # Limit the number of resumes displayed
+        for link, info in resume_dict.items():
+            resumes += (f"Кандидат: *{info.get('candidate_name')}*\n"
+                        f"Occupation: *{info.get('candidate_occupation')}*\n"
+                        f"Link: {link}\n\n")
+
+    total_text = (f"*Found {total_resume_count} resumes*\n"
+                  f"*Shown {RESUME_DISPLAY_COUNT}*\n\n\n") + resumes
+    if warning:
+        total_text += f"\n\n*{warning}*"
+
+    print(total_text)
+
+    await callback_query.message.answer(
+        text=total_text,
+        parse_mode="Markdown",
+    )
 
 
-async def send_list_of_dicts_as_message(message: types.Message, list_of_dicts, total_resume_count):
-    messages = []  # List to hold all message parts
-    current_message = ""  # String to hold the current message part being constructed
+def chunk_list(lst, chunk_size):
+    """
+    Function that is used to evenly distribute inline keyboard buttons
+    """
+    for i in range(0, len(lst), chunk_size):
+        yield lst[i:i + chunk_size]
 
-    # Function to add the current message to the messages list and reset it
-    def add_and_reset_current_message():
-        nonlocal current_message
-        if current_message:  # Only add if the current message is not empty
-            messages.append(current_message)
-            current_message = ""
 
-    for i, dictionary in enumerate(list_of_dicts, start=1):
-        # Construct the message for the current dictionary
-
-        dict_message = "".join([f"Кандидат *{value.get('candidate_name')}*"
-                                f"\n{value.get('candidate_occupation')}:"
-                                f"\n{key}" for key, value in dictionary.items()]) + "\n\n"
-        # Check if adding the next dictionary message would exceed the limit
-        if len(current_message) + len(dict_message) > MAX_MESSAGE_LENGTH:
-            add_and_reset_current_message()  # Add the current message to the list and reset it
-        current_message += dict_message  # Add the dictionary message to the current message
-
-    add_and_reset_current_message()  # Ensure the last part is added
-
-    # Send each message part
-    await message.answer(f"*A total of {total_resume_count} resumes were processed, "
-                         f"and {RESUME_DISPLAY_COUNT} of them were selected*",
-                         parse_mode="Markdown")
-    for msg_part in messages:
-        await message.answer(msg_part, parse_mode="Markdown")
+def create_formatted_inline_keyboard(values: list):
+    buttons = [InlineKeyboardButton(text=key, callback_data=key) for key in values]
+    button_rows = list(chunk_list(buttons, chunk_size=4))
+    experience_keyboard = InlineKeyboardMarkup(inline_keyboard=button_rows)
+    return experience_keyboard
